@@ -14,6 +14,15 @@ This project uses transfer learning with ResNet50 to classify breast cancer subt
 3. Used learning rate scheduler, early stopping, data augmentation and class weights
 4. Evaluated with F1-score, confusion matrix, and ROC-AUC
 
+## 📥 Download Pretrained Model
+
+You can download the fine-tuned ResNet50 model (`best_model.pt`) from the link below:
+
+🔗 https://drive.google.com/file/d/1qgGBZacJ3TrvERhNy2B0x5Upk__DWJRU/view?usp=drive_link
+
+After downloading, place the file in the `models/` folder:
+
+
 ## 🧪 Results
 
 <img src="results/cm_resnet.png" width="400">
