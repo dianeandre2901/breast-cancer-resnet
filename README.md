@@ -38,7 +38,7 @@ Performance metrics were computed from the final confusion matrix and ROC-AUC cu
 
 
 📊 Confusion Matrix:<img src="result/confusion_matrix.pdf" width="400">  
-📈 Training and Validation curve: <img src="result/training_val_curves.png" width="400">
+📈 Training and Validation curve: <img src="result/training_val_curves.pdf" width="400">
 
 > 🎯 This model achieved high precision and recall, indicating strong ability to distinguish benign from malignant samples — a critical need in medical diagnosis.
 
