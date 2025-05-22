@@ -8,12 +8,6 @@ Built using PyTorch and trained on the BreakHis dataset (converted to `.npy` for
 - 📈 Techniques: Transfer learning, data augmentation, early stopping, ROC analysis
 - 🧪 Metrics: Accuracy, F1-score, ROC-AUC
   
-## 💡 Overview
-- **Goal**: Multi-class classification of breast cancer subtypes
-- **Data**: BreakHis dataset (benign vs malignant + subtypes)
-- **Model**: ResNet50 pretrained on ImageNet
-- **Tools**: PyTorch, torchvision, matplotlib, numpy
-
 ## 🔬 Method
 1. Preprocessed `.npy` histopathology images
 2. Fine-tuned `ResNet50` with new classification head
