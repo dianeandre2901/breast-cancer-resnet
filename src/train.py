@@ -18,12 +18,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
-from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.utils.class_weight import compute_class_weight
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import os
+
+from src.utils import plot_confusion_matrix, plot_roc_curve, compute_classification_metrics
 
 # Set device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -145,15 +146,17 @@ def evaluate_model(model, loader):
 
 def preds_labels(model, loader):
     model.eval()
-    all_preds, all_labels = [], []
+    all_preds, all_labels, all_probs = [], [], []
     with torch.no_grad():
         for images, labels in loader:
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
+            probs = torch.softmax(outputs, dim=1)[:, 1]  # probability for class 1
             _, predicted = torch.max(outputs, 1)
             all_preds.extend(predicted.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
-    return np.array(all_preds), np.array(all_labels)
+            all_probs.extend(probs.cpu().numpy())
+    return np.array(all_preds), np.array(all_labels), np.array(all_probs)
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs=40,
                 save_model_path='best_model.pt', early_stopping=True, patience=5):
@@ -217,36 +220,13 @@ train_losses, val_losses, train_accs, val_accs = train_model(
     model, train_loader, val_loader, criterion, optimizer, scheduler,
     save_model_path=f"best_model_{batch}.pt")
 
-# Predictions + Metrics
-all_preds, all_labels = preds_labels(model, test_loader)
-cm_bin = confusion_matrix(all_labels, all_preds, labels=[0, 1])
+# Predictions + Metrics on test set
+all_preds, all_labels, all_probs = preds_labels(model, test_loader)
 
-# Save confusion matrix
-plt.figure(figsize=(6, 5))
-sns.heatmap(cm_bin, annot=True, fmt='d', cmap='Purples',
-            xticklabels=le_bin.classes_, yticklabels=le_bin.classes_)
-plt.xlabel("Predicted")
-plt.ylabel("True")
-plt.title("Confusion Matrix")
-plt.tight_layout()
-plt.savefig(f"en_{batch}_confusion_matrix.pdf")
-plt.close()
-
-# Compute metrics
-TP, TN = cm_bin[1,1], cm_bin[0,0]
-FP, FN = cm_bin[0,1], cm_bin[1,0]
-precision = TP / (TP + FP) if TP + FP else 0
-recall = TP / (TP + FN) if TP + FN else 0
-F1 = 2 * precision * recall / (precision + recall) if precision + recall else 0
-accuracy = (TP + TN) / np.sum(cm_bin)
-
-metrics_df = pd.DataFrame({
-    'Accuracy': [accuracy],
-    'Precision': [precision],
-    'Recall': [recall],
-    'F1 Score': [F1]
-})
-metrics_df.to_csv(f"en_{batch}_metrics.csv", index=False)
+cm = plot_confusion_matrix(all_labels, all_preds, le_bin.classes_, filename=f"en_{batch}_confusion_matrix.pdf")
+plot_roc_curve(all_labels, all_probs, filename=f"roc_curve_{batch}.pdf")
+metrics_df = compute_classification_metrics(cm, all_labels, all_probs, filename=f"en_{batch}_metrics.csv")
+print(metrics_df)
 
 # Plot training progress
 def plot_training_progress(train_losses, val_losses, train_accs, val_accs):
@@ -272,8 +252,3 @@ def plot_training_progress(train_losses, val_losses, train_accs, val_accs):
     plt.close()
 
 plot_training_progress(train_losses, val_losses, train_accs, val_accs)
-
-
-
-
-
