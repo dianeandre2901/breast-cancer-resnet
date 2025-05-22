@@ -161,7 +161,7 @@ def train_model_grid(model, train_dataset, val_dataset, lr, bs, patience, device
 
 # ==================== GRID SEARCH ====================
 results = []
-with open('/kaggle/input/param-json/params.jsonl') as f:
+with open('src/params/params.jsonl') as f:
     params_list = [json.loads(line) for line in f]
 
 for idx, hyperparams in enumerate(params_list):
