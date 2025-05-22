@@ -23,14 +23,24 @@ You can download the fine-tuned ResNet50 model (`best_model.pt`) from the link b
 After downloading, place the file in the `models/` folder:
 
 
-## 🧪 Results
+## 🧪 Final Test Set Performance
 
-<img src="results/cm_resnet.png" width="400">
-<img src="results/roc_auc.png" width="400">
+This model was evaluated on a held-out test set after hyperparameter tuning and early stopping.  
+Performance metrics were computed from the final confusion matrix and ROC-AUC curve.
 
-- 📈 Accuracy: 87%
-- 🔁 F1-Score (macro): 0.85
-- 🩺 Strong recall on malignant subtype classes
+| Metric     | Value     |
+|------------|-----------|
+| Accuracy   | **95.18%** |
+| Precision  | **98.14%** |
+| Recall     | **95.26%** |
+| F1 Score   | **96.68%** |
+| AUC        | **95.11%** |
+
+
+📊 Confusion Matrix:<img src="result/confusion_matrix.pdf" width="400">  
+📈 Training and Validation curve: <img src="result/training_val_curves.png" width="400">
+
+> 🎯 This model achieved high precision and recall, indicating strong ability to distinguish benign from malignant samples — a critical need in medical diagnosis.
 
 ## 🧠 Key Learnings
 - Transfer learning is highly effective on medical images
@@ -46,4 +56,4 @@ pip install -r requirements.txt
 python src/train.py
 
 # 3. Evaluate or load model
-python src/evaluate.py --model models/best_model.pt
+python src/utils.py --model models/best_model.pt
